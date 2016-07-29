@@ -1,0 +1,76 @@
+.dir-item{
+	float: left;
+	padding: 10px 0px 10px 20px;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	font-size: 16px;
+	color: #000;
+	font-weight: bold;
+	margin: 5px 0px 5px 0px;
+	width: 100%;
+}
+
+.inside-folder{
+	display: none;
+}
+
+.file-item{
+	padding: 20px 20px 20px 35px;
+	margin: 5px 0px 5px 0px;
+	clear: both;
+	border-top: 1px solid #ccc;
+}
+
+.folder-icon{
+	float: left;
+	width: 50px;
+	height: 50px;
+}
+
+.file-icon{
+	float: left;
+	width: 110px;
+	height: 110px;
+}
+
+.folder-options{
+	float: left;
+}
+
+.dir-name{
+	float: left;	
+}
+
+.folder-name{
+	float: left;
+	font-size: 20px;
+	color: #000;
+	font-weight: bold;
+	font-style: italic;
+	padding: 10px 0px 0px 20px;
+}
+
+.file-name{
+	color: #000;
+	font-size: 18px;
+	font-weight: bold;
+	text-transform: uppercase;
+	float: left;
+}
+
+.file-descr{
+	color: #888;
+	font-size: 16px;
+	float: left;
+	font-weight: 200;
+}
+
+.file-content{
+	float: left;
+}
+
+.file-options{
+	color: #888;
+	font-size: 16px;
+	float: left;
+}
