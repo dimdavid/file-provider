@@ -29,6 +29,7 @@ class DimdavidFileProvider {
 		if (is_admin()){
 			$this->admin_includes();
 			$this->admin_init_actions();
+			$this->admin_init();
 		}
 		$this->includes();
 		$this->init_actions();
@@ -37,6 +38,11 @@ class DimdavidFileProvider {
 	}
 	
 	private function admin_includes(){
+		include_once dirname( __FILE__ ) . '/includes/file-provider-admin.php';
+	}
+	
+	private function admin_init(){
+		$fpAdmin = new DimdavidFileProviderAdmin();
 	}
 	
 	private function admin_init_actions(){
