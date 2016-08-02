@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: File Provider
-Plugin URI: http://www.softbisti.com.br/plugins/file-provider
-Description: Disponibiliza acesso a arquivos organizados
+Plugin URI: https://github.com/dimdavid/file-provider
+Description: It offers files on your page neatly. Enables direct editing descriptions, conduct upload directly by the front-end, differentiate public or private visibility and protects the actual link of the file to download.
 Version: 1.0.0
-Author: Davidson Marques
+Author: dimdavid
 Author URI: http://dimdavid.wordpress.com/
 License: GPLv2 or later
 */
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-if ( ! class_exists( 'dimdavidFileManager' ) ) :
+if ( ! class_exists( 'DimdavidFileProvider' ) ) :
 
 class DimdavidFileProvider {
 
@@ -40,9 +40,9 @@ class DimdavidFileProvider {
 	}
 	
 	private function admin_init_actions(){
-		add_action('wp_ajax_sfm_save',array($this,'save_descr'));
-		add_action('wp_ajax_sfm_rename_folder', array($this, 'rename_folder'));
-		add_action('wp_ajax_sfm_download_file', array($this, 'download_file'));
+		add_action('wp_ajax_dfp_save',array($this,'save_descr'));
+		add_action('wp_ajax_dfp_rename_folder', array($this, 'rename_folder'));
+		add_action('wp_ajax_dfp_download_file', array($this, 'download_file'));
 	}
 	
 	private function includes(){
@@ -50,23 +50,20 @@ class DimdavidFileProvider {
 	
 	private function init_actions(){
 		add_shortcode('dimdavid_file_provider', array($this, 'show'));
-		add_action('wp_ajax_nopriv_sfm_download_file', array($this, 'download_file'));
+		add_action('wp_ajax_nopriv_dfp_download_file', array($this, 'download_file'));
 	}
 	
 	private function init_values(){
 		$this->pluginFilesPath = plugin_dir_path( __FILE__ );
-		$this->themeFilePath = get_template_directory() . '/dimdavid-file-manager/';
-		$this->themeUri = get_template_directory_uri() . '/dimdavid-file-manager/';
-		$this->pluginUri = plugins_url( 'dimdavid-file-manager/', dirname(__FILE__) );
+		$this->themeFilePath = get_template_directory() . '/file-provider/';
+		$this->themeUri = get_template_directory_uri() . '/file-provider/';
+		$this->pluginUri = plugins_url( 'file-provider/', dirname(__FILE__) );
 	}
 	
-	
 	public static function get_instance() {
-		// If the single instance hasn't been set, set it now.
 		if ( null == self::$instance ) {
 			self::$instance = new self;
 		}
-
 		return self::$instance;
 	}
 
@@ -106,12 +103,12 @@ class DimdavidFileProvider {
 	
 	public function get_file_group($fileId){
 		global $wpdb;
-		return $wpdb->get_var('select `sfm_group_id` from ' . $wpdb->prefix . 'sfm_files where `id`=' . $fileId);
+		return $wpdb->get_var('select `dfp_group_id` from ' . $wpdb->prefix . 'dfp_files where `id`=' . $fileId);
 	}
 	
 	public function get_group_name($groupId){
 		global $wpdb;
-		return $wpdb->get_var('select `name` from ' . $wpdb->prefix . 'sfm_group where `id`=' . $groupId);
+		return $wpdb->get_var('select `name` from ' . $wpdb->prefix . 'dfp_group where `id`=' . $groupId);
 	}
 	
 	protected function get_plugin_file($fileName){
@@ -213,7 +210,7 @@ function sfmFolderSave(folderId, groupId){
 	cancelNameBut = document.getElementById("cfn" + folderId);
 	
 	var url = "' . get_bloginfo('url') . '/wp-admin/admin-ajax.php";
-	var data = "action=sfm_rename_folder&groupId=" + groupId + "&folderId=" + folderId + "&newFolderName=" + inputName.value;
+	var data = "action=dfp_rename_folder&groupId=" + groupId + "&folderId=" + folderId + "&newFolderName=" + inputName.value;
 	var xhttp=new XMLHttpRequest();
 	xhttp.open("POST", url, false);
 	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -248,7 +245,7 @@ function sfmSave(fileId){
 	save = document.getElementById("s" + fileId);
 	cancel = document.getElementById("c" + fileId);
 	var url = "' . get_bloginfo('url') . '/wp-admin/admin-ajax.php";
-	var data = "action=sfm_save&fileDescr=" + field.value + "&fileId=" + fileId;
+	var data = "action=dfp_save&fileDescr=" + field.value + "&fileId=" + fileId;
 	var xhttp=new XMLHttpRequest();
 	xhttp.open("POST", url, false);
 	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -292,7 +289,7 @@ function findFiles(){
 }
 
 function fileOpen(fileId){
-	var url = "' . get_bloginfo('url') . '/wp-admin/admin-ajax.php?action=sfm_download_file&fileId=" + fileId;
+	var url = "' . get_bloginfo('url') . '/wp-admin/admin-ajax.php?action=dfp_download_file&fileId=" + fileId;
 	window.open(url, "_blank");
 }
 
@@ -314,12 +311,12 @@ function fileOpen(fileId){
 	
 	protected function get_file_id($path, $group){
 		global $wpdb;
-		return $wpdb->get_var('select `id` from ' . $wpdb->prefix . 'sfm_files where `filepath`=\'' . $path . '\' and sfm_group_id=' . $group);
+		return $wpdb->get_var('select `id` from ' . $wpdb->prefix . 'dfp_files where `filepath`=\'' . $path . '\' and dfp_group_id=' . $group);
 	}
 	
 	protected function get_file_descr($fileId){
 		global $wpdb;
-		return $wpdb->get_var('select `descr` from ' . $wpdb->prefix . 'sfm_files where `id`=' . $fileId);
+		return $wpdb->get_var('select `descr` from ' . $wpdb->prefix . 'dfp_files where `id`=' . $fileId);
 	}
 	
 	protected function read_path($path, $group){
@@ -434,10 +431,10 @@ function fileOpen(fileId){
 			$atualName = end(explode('/', $atualPath));
 			$newPath = str_replace($atualName, $newFolderName, $atualPath);
 			if (rename($atualPath, $newPath)){
-				$files = $wpdb->get_results('select `id`, `filepath` from `'. $wpdb->prefix .'sfm_files` where `sfm_group_id`=' . $groupId . ' and `filepath` like `' . $atualPath . '%`');
+				$files = $wpdb->get_results('select `id`, `filepath` from `'. $wpdb->prefix .'dfp_files` where `dfp_group_id`=' . $groupId . ' and `filepath` like `' . $atualPath . '%`');
 				foreach ($files as $file){
 					$newFilePath = str_replace($atualPath, $newPath, $file->filepath);
-					$wpdb->update($wpdb->prefix . 'sfm_files', array('filepath' => $newFilePath), array('id' => $file->id), array('%s'), array('%d'));
+					$wpdb->update($wpdb->prefix . 'dfp_files', array('filepath' => $newFilePath), array('id' => $file->id), array('%s'), array('%d'));
 				}
 				die('1');
 			} else {
@@ -452,7 +449,7 @@ function fileOpen(fileId){
 	
 	public function isRestricted($groupId){
 		global $wpdb;
-		$restricted = $wpdb->get_var('select `restricted` from ' . $wpdb->prefix . 'sfm_group where `id`=' . $groupId);
+		$restricted = $wpdb->get_var('select `restricted` from ' . $wpdb->prefix . 'dfp_group where `id`=' . $groupId);
 		if ($restricted == 1){
 			return true;
 		} else {
@@ -487,46 +484,44 @@ function fileOpen(fileId){
 	
 	protected function get_group_path($groupId){
 		global $wpdb;
-		$query = 'select `dirpath` from `' . $wpdb->prefix . 'sfm_group` where `id`=' . $groupId;
+		$query = 'select `dirpath` from `' . $wpdb->prefix . 'dfp_group` where `id`=' . $groupId;
 		return $wpdb->get_var($query);
 	}
 	
 	protected function get_file_path($id){
 		global $wpdb;
-		$query = 'select `filepath` from `' . $wpdb->prefix . 'sfm_files`where `id`=' . $id;
+		$query = 'select `filepath` from `' . $wpdb->prefix . 'dfp_files`where `id`=' . $id;
 		return $wpdb->get_var($query);
 	}
 	
 	protected function check_database(){
 		global $wpdb;
-		$sql_groups = 'create table if not exists `' . $wpdb->prefix . 'sfm_group` (
+		$sql_groups = 'create table if not exists `' . $wpdb->prefix . 'dfp_group` (
 					`id` int(11) unsigned NOT NULL auto_increment,
 					`name` varchar(30),
 					`dirpath` varchar(4000),
 					`restricted` tinyint not null default 0,
 					primary key (`id`)
 				)';
-		$sql_files = 'create table if not exists `' . $wpdb->prefix . 'sfm_files` (
+		$sql_files = 'create table if not exists `' . $wpdb->prefix . 'dfp_files` (
 					`id` int(11) unsigned NOT NULL auto_increment,
-					`sfm_group_id` int(11),
+					`dfp_group_id` int(11),
 					`filepath` varchar(4000),
 					`descr` varchar(4000),
 					primary key (`id`)
 				)';
-		$conn = mysql_connect(DB_HOST,DB_USER,DB_PASSWORD);
-		mysql_select_db(DB_NAME);
-		$resultSet = mysql_query($sql_groups,$conn);
-		$resultSet = mysql_query($sql_files,$conn);
+		$wpdb->query($sql_groups);
+		$wpdb->query($sql_files);
 	}
 
 	protected function import_files($path, $group){
 		global $wpdb;
 		if (is_dir($path)){	
 			$folderPath = str_replace('\\', '/', $path);
-			$query = 'select `id` from `' . $wpdb->prefix . 'sfm_files` where `filepath`=\'' . $folderPath .'\' and `sfm_group_id`=' . $group;
+			$query = 'select `id` from `' . $wpdb->prefix . 'dfp_files` where `filepath`=\'' . $folderPath .'\' and `dfp_group_id`=' . $group;
 			$wpdb->get_results($query);
 			if ($wpdb->num_rows == 0){
-				$wpdb->insert($wpdb->prefix . 'sfm_files', array('filepath' => $folderPath, 'sfm_group_id' => $group), array( '%s', '%d'));
+				$wpdb->insert($wpdb->prefix . 'dfp_files', array('filepath' => $folderPath, 'dfp_group_id' => $group), array( '%s', '%d'));
 			}
 			$scn = scandir($path);
 			$ct = 0;
@@ -537,10 +532,10 @@ function fileOpen(fileId){
 					} else {
 						$filePath = $path . '/' . $sc;
 						$filePath = str_replace('\\', '/', $filePath);
-						$query = 'select `id` from `' . $wpdb->prefix . 'sfm_files` where `filepath`=\'' . $filePath .'\' and `sfm_group_id`=' . $group;
+						$query = 'select `id` from `' . $wpdb->prefix . 'dfp_files` where `filepath`=\'' . $filePath .'\' and `dfp_group_id`=' . $group;
 						$wpdb->get_results($query);
 						if ($wpdb->num_rows == 0){
-							$wpdb->insert($wpdb->prefix . 'sfm_files', array('filepath' => $filePath, 'sfm_group_id' => $group), array( '%s', '%d'));
+							$wpdb->insert($wpdb->prefix . 'dfp_files', array('filepath' => $filePath, 'dfp_group_id' => $group), array( '%s', '%d'));
 						}
 					}
 				}
@@ -554,7 +549,7 @@ function fileOpen(fileId){
 		if (current_user_can('edit_pages')){
 			$descr = $_POST['fileDescr'];
 			$id = $_POST['fileId'];
-			$wpdb->update($wpdb->prefix . 'sfm_files', array('descr' => $descr), array('id' => $id), array('%s'), array('%d'));
+			$wpdb->update($wpdb->prefix . 'dfp_files', array('descr' => $descr), array('id' => $id), array('%s'), array('%d'));
 			wp_die('1');
 		} else {
 			wp_die('0');
@@ -577,9 +572,7 @@ function fileOpen(fileId){
 		$folderId = $_POST['folderId'];
 		$folderPath = $this->get_file_path($folderId);
 		$nome_final = $_FILES['userFile']['name'];
-		if (move_uploaded_file($_FILES['userFile']['tmp_name'], $folderPath . '/' . $nome_final)) {
-			// Upload efetuado com sucesso, apenas continua a abertura da página.
-		} else {
+		if (!move_uploaded_file($_FILES['userFile']['tmp_name'], $folderPath . '/' . $nome_final)) {
 			echo '<div class="error">Não foi possível enviar o arquivo. Tente novamente. Se o erro persistir, entre em contato com o administrador.</div>';
 		}
 	}
@@ -592,9 +585,7 @@ function fileOpen(fileId){
 		$folderPath = $this->get_file_path($folderId);
 		$path = $folderPath . '/' . $folderName;		
 		if(!is_dir($path)){
-			if(mkdir($path)){
-				//Continua a abertura da página;
-			} else {
+			if(!mkdir($path)){
 				echo '<div class="error">Não foi possível criar a pasta. Tente novamente. Se o erro persistir, entre em contato com o administrador.</div>';
 			}
 		}
@@ -605,8 +596,7 @@ function fileOpen(fileId){
 		$folderPath = $this->get_file_path($folderId);
 		if(is_dir($folderPath)){
 			if(rmdir($folderPath)){
-				$this->remove_file_register($folderId); //remove entrada na base de dados
-				//continua a abertura da página
+				$this->remove_file_register($folderId); 
 			} else {
 				echo '<div class="error">Não foi possível remover a pasta. Verifique se ela está vazia.</div>';
 			}
@@ -620,8 +610,7 @@ function fileOpen(fileId){
 		$filePath = $this->get_file_path($fileId);
 		if(is_file($filePath)){
 			if(unlink($filePath)){
-				$this->remove_file_register($fileId); //remove entrada na base de dados
-				//continua a abertura da página
+				$this->remove_file_register($fileId); 
 			} else {
 				echo '<div class="error">Não foi possível remover o arquivo.</div>';
 			}
@@ -632,7 +621,7 @@ function fileOpen(fileId){
 	
 	protected function remove_file_register($id){
 		global $wpdb;
-		$wpdb->delete( $wpdb->prefix . 'sfm_files', array( 'id' => $id ), array( '%d' ) );
+		$wpdb->delete( $wpdb->prefix . 'dfp_files', array( 'id' => $id ), array( '%d' ) );
 	}
 	
 }
