@@ -55,7 +55,7 @@ class DimdavidFileProvider {
 	}
 	
 	private function init_actions(){
-		add_shortcode('dimdavid_file_provider', array($this, 'show'));
+		add_shortcode('file_provider', array($this, 'show'));
 		add_action('wp_ajax_nopriv_dfp_download_file', array($this, 'download_file'));
 	}
 	
@@ -505,6 +505,7 @@ function fileOpen(fileId){
 		$sql_groups = 'create table if not exists `' . $wpdb->prefix . 'dfp_group` (
 					`id` int(11) unsigned NOT NULL auto_increment,
 					`name` varchar(30),
+					`showname` varchar(50),
 					`dirpath` varchar(4000),
 					`restricted` tinyint not null default 0,
 					primary key (`id`)
@@ -585,14 +586,19 @@ function fileOpen(fileId){
 	
 	public function create_folder(){
 		$folderName = $_POST['newFolderMame'];
-		$except = array('\\', '/', ':', '*', '?', '"', '<', '>', '|', '.'); 
-		$folderName = str_replace($except, '', $folderName);
-		$folderId = $_POST['folderId'];
-		$folderPath = $this->get_file_path($folderId);
-		$path = $folderPath . '/' . $folderName;		
-		if(!is_dir($path)){
-			if(!mkdir($path)){
-				echo '<div class="error">Não foi possível criar a pasta. Tente novamente. Se o erro persistir, entre em contato com o administrador.</div>';
+		if ($folderName != ''){
+			$except = array('\\', '/', ':', '*', '?', '"', '<', '>', '|', '.'); 
+			$folderName = str_replace($except, '', $folderName);
+			$folderId = $_POST['folderId'];
+			$folderPath = $this->get_file_path($folderId);
+			$path = $folderPath . '/' . $folderName;
+			$path = str_replace('//', '/', $path);
+			$path = str_replace('\\\\', '\\', $path);
+			if(!is_dir($path)){
+				echo $path;
+				if(!mkdir($path)){
+					echo '<div class="error">Não foi possível criar a pasta. Tente novamente. Se o erro persistir, entre em contato com o administrador.</div>';
+				}
 			}
 		}
 	}
