@@ -450,7 +450,7 @@ function fileOpen(fileId){
 	}
 	
 	protected function forbidden(){
-		return 'Acesso permitido apenas a usuários cadastrados. Cadastre-se ou realize o login antes de continuar.';
+		return '<div class="error">Acesso permitido apenas a usuários cadastrados. Cadastre-se ou realize o login antes de continuar.</div>';
 	}
 	
 	public function isRestricted($groupId){

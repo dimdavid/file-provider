@@ -145,7 +145,7 @@ class DimdavidFileProviderAdmin {
 		<h4>Remover</h4>
 		<p>Ao excluir uma pasta, apenas o registro será removido. A pasta continuará a existir com seus arquivos.</p>
 		<h4>Restrito</h4>
-		<p>Apenas usuários autenticados poderão ver o conteúdo de pastas marcadas como restritas</p>
+		<p>Apenas usuários autenticados poderão ver o conteúdo de pastas marcadas como restritas.</p>
 		';
 		return $notes;
 	}
