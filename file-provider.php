@@ -316,6 +316,7 @@ function fileOpen(fileId){
 	}
 	
 	protected function get_file_id($path, $group){
+		$path = str_replace('\\', '/', $path);
 		global $wpdb;
 		return $wpdb->get_var('select `id` from ' . $wpdb->prefix . 'dfp_files where `filepath`=\'' . $path . '\' and dfp_group_id=' . $group);
 	}
@@ -331,11 +332,14 @@ function fileOpen(fileId){
 		$folder = explode('/', $folderPath);
 		$folder = end($folder);
 		$folderId = $this->get_file_id($folderPath, $group);
-		$html = '<div class="dir-item">'; 
-		$html = $html . '<div class="dir-name">';
-		$html = $html . '<div class="folder-icon" id="icon_' . $folder . '" style="background-image: url(' . $this->get_plugin_file('images/folder.png') . '); background-position: center center;" onclick="sfmShowHide(\'' . $folder . '\');"></div><div id="fn' . $folderId . '" class="folder-name">'. $folder .'</div><input type="text" id="ifn' . $folderId . '" value="' . $folder . '" class="folder-name-edit" style="display:none" />';
 		$groupPath = $this->get_group_path($group);
 		$groupPath = str_replace('\\', '/', $groupPath);
+		$html = '<div class="dir-item">'; 
+		$html .= '<div class="dir-name">';
+		$html .= '<div class="folder-icon" id="icon_' . $folder . '" style="background-image: url(' . $this->get_plugin_file('images/folder.png') . '); background-position: center center;" onclick="sfmShowHide(\'' . $folder . '\');"></div><div id="fn' . $folderId . '" class="folder-name">';
+		($groupPath == $folderPath) ? $show_name = $this->get_group_showname($group) : $show_name = $folder;
+		$html .= $show_name;
+		$html .= '</div><input type="text" id="ifn' . $folderId . '" value="' . $folder . '" class="folder-name-edit" style="display:none" />';
 		if (current_user_can('edit_pages')){
 			$html = $html . '
 			<div class="folder-options">';
@@ -491,6 +495,12 @@ function fileOpen(fileId){
 	protected function get_group_path($groupId){
 		global $wpdb;
 		$query = 'select `dirpath` from `' . $wpdb->prefix . 'dfp_group` where `id`=' . $groupId;
+		return $wpdb->get_var($query);
+	}
+	
+	protected function get_group_showname($groupId){
+		global $wpdb;
+		$query = 'select `showname` from `' . $wpdb->prefix . 'dfp_group` where `id`=' . $groupId;
 		return $wpdb->get_var($query);
 	}
 	
