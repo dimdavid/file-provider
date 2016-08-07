@@ -15,10 +15,10 @@
 }
 
 .file-item{
-	padding: 20px 20px 20px 35px;
-	margin: 5px 0px 5px 0px;
-	clear: both;
-	border-top: 1px solid #ccc;
+	padding: 10px;
+    margin: 5px 5px 0px 40px;
+    clear: both;
+    float: left;
 }
 
 .folder-icon{
@@ -33,8 +33,11 @@
 
 .file-icon{
 	float: left;
-	width: 110px;
-	height: 110px;
+	width: 48px;
+	height: 48px;
+	background-position: center center;
+	background-size: 100%;
+	background-repeat: no-repeat;
 }
 
 .folder-options{
@@ -45,7 +48,7 @@
 }
 
 .dir-name{
-	float: left;	
+	float: left;
 }
 
 .folder-name{
@@ -59,10 +62,9 @@
 
 .file-name{
 	color: #000;
-	font-size: 18px;
-	font-weight: bold;
 	text-transform: uppercase;
 	float: left;
+	padding: 10px;
 }
 
 .file-descr{

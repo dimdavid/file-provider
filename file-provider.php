@@ -131,7 +131,12 @@ class DimdavidFileProvider {
 		$fileName = 'images/' . $ext . '.png';
 		$filePath = $this->themeFilePath . $fileName;
 		if (!file_exists($filePath)){
-			$fileUri = $this->pluginUri . 'images/unknow.png';
+			$filePath = $this->pluginFilesPath . $fileName;
+			if (file_exists($filePath)){
+				$fileUri = $this->pluginUri . $fileName;
+			} else {
+				$fileUri = $this->pluginUri . 'images/unknow.png';
+			}
 		} else {
 			$fileUri = $this->themeUri . $fileName;
 		}
