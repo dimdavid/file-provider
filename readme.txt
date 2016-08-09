@@ -8,6 +8,7 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Folder sharing directly in the page or post content.
+Disponibilize pastas diretamente no conteúdo de paginas ou posts.
 
 == Description ==
 
@@ -33,6 +34,10 @@ Permite disponibilizar arquivos de forma simplificada em sua página de maneira 
 * Cadasrte sua pasta na página de configuração;
 * Insira o shortcode no conteúdo de sua página.
 
+== Screenshots ==
+1. File provider options - Opções de configuração do File provider;
+2. Show folder into Twenty Fifteen theme - Pasta exibida dentro do tema Twenty Fifteen.
+
 == Changelog ==
 
 = 0.1 =
@@ -41,6 +46,6 @@ Permite disponibilizar arquivos de forma simplificada em sua página de maneira 
 Follow updates to enjoy all of them and to correct any problems.
 Please do not hesitate to contact to report any deficiency found.
 
-* Esta é  a primeira versão funcional, mas a primeira versão estável está chegando em breve, com o teste e compatibilização de todas as funcionalidades.
+* Esta é a primeira versão funcional, mas a primeira versão estável está chegando em breve, com o teste e compatibilização de todas as funcionalidades.
 Acompanhe as atualizações para usufruir de todas elas e para corrigir eventuais problemas.
 Peço que não deixe de entrar em contato para comunicar alguma deficiência encontrada.

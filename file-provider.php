@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: File Provider
-Plugin URI: https://github.com/dimdavid/file-provider
+Plugin URI: https://wordpress.org/plugins/file-provider
 Description: It offers files on your page neatly. Enables direct editing descriptions, conduct upload directly by the front-end, differentiate public or private visibility and protects the actual link of the file to download.
 Version: 0.1.0
 Author: dimdavid
