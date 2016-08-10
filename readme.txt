@@ -2,8 +2,9 @@
 Contributors: dimdavid
 Donate link: https://dimdavid.wordpress.com/
 Tags: file, file manager, share, protect link, file provider, file page, directory 
-Requires at last: 4.0
-Tested up tp: 4.5.3
+Requires at least: 3.9.13
+Tested up to: 4.5.3
+Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +27,7 @@ It offers files on your page neatly. Enables direct editing descriptions, conduc
 * Identification of key file extensions, with different icon view;
 * Customization facilitated where the plugin checks for a CSS file in your theme. For example: "/wp-content/themes/seuTema/file-provider/style.css";
 * Customizarion of icons where the plugin checks for custom icons in your theme. For example: "/wp-content/themes/seuTema/file-provider/images/unknow.png";
+* Does not reveal the actual link to download the file
 
 ### O que é? ###
 
@@ -41,6 +43,11 @@ Permite disponibilizar arquivos de forma simplificada em sua página de maneira 
 * Identificação das principais extensões de arquivos, com exibição de ícones diferenciada;
 * Customização facilitada onde o plugin checa a existência de um arquivo de CSS dentro do tema utilizado. Por exemplo: "/wp-content/themes/seuTema/file-provider/style.css";
 * Customização de ícones onde o plugin checa a existência de ícones customizados dentro do tema utilizado. Por exemplo: "/wp-content/themes/seuTema/file-provider/images/unknow.png";
+* Não revela o link real de download do arquivo;
+
+= External reference =
+
+Icons family acquired free through http://www.iconarchive.com/
 
 = Referência externa =
 
@@ -63,6 +70,24 @@ Família de ícones adquirida gratuitamente através do http://www.iconarchive.c
 == Screenshots ==
 1. File provider options - Opções de configuração do File provider;
 2. Show folder into Twenty Fifteen theme - Pasta exibida dentro do tema Twenty Fifteen.
+
+== Frequently Asked Questions == 
+
+= I can upload files, but, i can't download. Why? =
+
+It occurs when files are sent with invalid characters in the name.
+
+= I can't upload files, why? =
+
+Check the folder permissions.
+
+= Consigo realizar o upload do arquivo, porém, não consigo realizar o download. O que está acontecendo? =
+
+Ocorre quando arquivos são enviados com caracteres inválidos no nome.
+
+= Não consigo realizar o upload, o que pode estar errado? =
+
+Verifique as permissões da pasta utilizada.
 
 == Changelog ==
 
