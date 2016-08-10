@@ -16,9 +16,35 @@ Disponibilize pastas diretamente no conteúdo de paginas ou posts.
 
 It offers files on your page neatly. Enables direct editing descriptions, conduct upload directly by the front-end, differentiate public or private visibility and protects the actual link of the file to download.
 
+= Features =
+
+* Share folder through shortcode inserted into the page or post content;
+* Edit the description of the files directly on front-end page when accessed by administrator or editor;
+* Create child folders directly on front-end;
+* Upload files directly from the display page;
+* Upload files using FTP and automatically load in next access;
+* Identification of key file extensions, with different icon view;
+* Customization facilitated where the plugin checks for a CSS file in your theme. For example: "/wp-content/themes/seuTema/file-provider/style.css";
+* Customizarion of icons where the plugin checks for custom icons in your theme. For example: "/wp-content/themes/seuTema/file-provider/images/unknow.png";
+
 ### O que é? ###
 
 Permite disponibilizar arquivos de forma simplificada em sua página de maneira organizada. Possibilita edição direta de descrições, realizar upload diretamente pelo front-end, diferenciar visibilidade pública ou privada e ainda não revela o link real do arquivo a ser baixado.
+
+= Funcionalidades =
+
+* Disponibilizar pasta de arquivos através de shortcode inserido no conteúdo da página ou post;
+* Editar descrição dos arquivos diretamente na página de exibição, quando acessado por administrador ou editor;
+* Criar pastas filhas diretamente na página de exibição;
+* Upload de arquivos diretamente pela página de exibição;
+* Upload de arquivos por FTP e carga automática deles no próximo acesso;
+* Identificação das principais extensões de arquivos, com exibição de ícones diferenciada;
+* Customização facilitada onde o plugin checa a existência de um arquivo de CSS dentro do tema utilizado. Por exemplo: "/wp-content/themes/seuTema/file-provider/style.css";
+* Customização de ícones onde o plugin checa a existência de ícones customizados dentro do tema utilizado. Por exemplo: "/wp-content/themes/seuTema/file-provider/images/unknow.png";
+
+= Referência externa =
+
+Família de ícones adquirida gratuitamente através do http://www.iconarchive.com/
 
 == Installation ==
 
