@@ -17,7 +17,7 @@ if ( ! class_exists( 'DimdavidFileProvider' ) ) :
 
 class DimdavidFileProvider {
 
-	const VERSION = '0.1.0';
+	const VERSION = '0.1.1';
 	protected static $instance = null;
 
 	protected $pluginFilesPath = '';
@@ -156,8 +156,8 @@ class DimdavidFileProvider {
 
 	protected function script(){
 		$jsContent = $this->read_plugin_file('functions.js');
-		$folderClose = 'url(' . $this->get_plugin_file('images/folder.png') . ')';
-		$folderOpen = 'url(' . $this->get_plugin_file('images/folder2.png') . ')';
+		$folderClose = 'url("' . $this->get_plugin_file('images/folder.png') . '")';
+		$folderOpen = 'url("' . $this->get_plugin_file('images/folder2.png') . '")';
 		$html = '
 <script>
 function sfmOpenClose(idElement){

@@ -91,6 +91,12 @@ Verifique as permissões da pasta utilizada.
 
 == Changelog ==
 
+= 0.1.1 =
+
+* Fix open and close folder visual eftect.
+
+* Correção de efeito visual de abertura e fechamento de pasta.
+
 = 0.1 =
 
 * This is the first functional version, but the first stable version is coming soon with the test and support all of the features.
