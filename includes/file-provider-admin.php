@@ -69,7 +69,6 @@ class DimdavidFileProviderAdmin {
 	
 	public function file_provider_menu(){
 		add_options_page('File Provider', 'File Provider Options', 'manage_options', 'file-provider-options', array($this, 'file_provider_options_page'));
-		add_menu_page( 'Aquisições', 'Aquisições', 'edit_posts', 'report', array($this, 'lista_pedidos'), '', '' );
 	}
 
 	public function file_provider_options_page(){
