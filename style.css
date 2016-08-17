@@ -83,3 +83,16 @@
 	font-size: 16px;
 	float: left;
 }
+
+.error{
+	border:1px solid #D2B0B5;
+	float: left;
+	clear: both;
+	border-radius: 4px;
+	background-color:#f2dede;
+	font-family:verdana;
+	font-size:13px;
+	color:#b94a48;
+	width:95%;
+	padding:10px; 
+}
