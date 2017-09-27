@@ -472,6 +472,16 @@ function fileOpen(fileId){
 		}
 	}
 	
+	public function isAutoRefresh($groupId){
+		global $wpdb;
+		$auto_refresh = $wpdb->get_var('select `auto_refresh` from ' . $wpdb->prefix . 'dfp_group where `id`=' . $groupId);
+		if ($auto_refresh == 1){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public function show($atts){
 		echo $this->style();
 		echo $this->script();
@@ -485,7 +495,9 @@ function fileOpen(fileId){
 			if($_POST){
 				$this->post_option_folder();
 			}
-			$this->import_files($groupPath, $groupId);
+			if($this->isAutoRefresh($groupId)){
+				$this->import_files($groupPath, $groupId);
+			}
 		}
 		echo $this->show_search();
 		echo $this->read_path($groupPath, $groupId);
@@ -534,6 +546,13 @@ function fileOpen(fileId){
 				)';
 		$wpdb->query($sql_groups);
 		$wpdb->query($sql_files);
+		try{
+			$sql_auto_refresh = 'select `auto_refresh` from `' . $wpdb->prefix . 'dfp_group` limit 1';
+			$value = $wpdb->get_var($sql_auto_refresh);
+		} catch (Exception $e){
+			$sql_auto_refresh = 'alter table `' . $wpdb->prefix . 'dfp_group` add auto_refresh tinyint not null default 1';
+			$wpdb->query($sql_auto_refresh);
+		}
 	}
 
 	protected function import_files($path, $group){
