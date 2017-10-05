@@ -37,7 +37,7 @@ class DimdavidFileProviderAdmin {
 		$wpdb->delete( $wpdb->prefix . 'dfp_group', array( 'id' => $id ), array( '%d' ) );
 	}
 	
-	private function insert_folder_register($name, $slug, $path, $restrict){
+	private function insert_folder_register($name, $slug, $path, $restrict, $auto_refresh){
 		global $wpdb;
 		$wpdb->insert( 
 			$wpdb->prefix . 'dfp_group', 
@@ -45,26 +45,69 @@ class DimdavidFileProviderAdmin {
 				'name' => $slug, 
 				'showname' => $name,
 				'dirpath' => $path,
-				'restricted' => $restrict
+				'restricted' => $restrict,
+				'auto_refresh' => $auto_refresh
 			), 
 			array( 
 				'%s', 
 				'%s', 
 				'%s', 
-				'%d' 
+				'%d',
+				'%d'
 			) 
 		);
 	}
 	
 	public function post_option_inputs(){
-		if ($_POST['option'] == 'insert'){
-			$folderPath = $_POST['folder_path'];
-			if ($this->create_folder($folderPath)){
-				$this->insert_folder_register($_POST['folder_name'], $_POST['folder_slug'], $_POST['folder_path'], $_POST['folder_restrict']);
-			}			
-		} else if ($_POST['option'] == 'remove'){
-			$this->remove_folder_register($_POST['folder_id']);
+		$option = sanitize_text_field($_POST['option']);
+		switch($option){
+		
+			case 'insert':
+				$folderPath = sanitize_text_field($_POST['folder_path']);
+				if ($this->create_folder($folderPath)){
+					$this->insert_folder_register(sanitize_text_field($_POST['folder_name']), sanitize_text_field($_POST['folder_slug']), str_replace('//', '/', str_replace('\\\\', '\\', sanitize_text_field($_POST['folder_path']))), sanitize_text_field($_POST['folder_restrict']), sanitize_text_field($_POST['folder_refresh']));
+				}	
+			break;
+			
+			case 'remove':
+				$this->remove_folder_register(sanitize_text_field($_POST['folder_id']));
+			break;
+			
+			case 'refresh':
+				$folderPath = str_replace('//', '/', str_replace('\\\\', '\\', sanitize_text_field($_POST['folder_path'])));
+				$groupId = sanitize_text_field($_POST['folder_id']);
+				$dfp = DimdavidFileProvider::get_instance();
+				$dfp->admin_import_files($folderPath, $groupId);
+			break;
+			
+			case 'restricted':
+				$this->change_restrict(sanitize_text_field($_POST['folder_id']));
+			break;
+			
+			case 'auto_refresh';
+				$this->change_auto_refresh(sanitize_text_field($_POST['folder_id']));
+			break;
+			
 		}
+	}
+	
+	public function change_restrict($folder_id){
+		$folder = $this->get_folder_options($folder_id);
+		$v = ($folder->restricted == 1) ? 0 : 1;
+		global $wpdb;
+		$wpdb->query('update `' . $wpdb->prefix . 'dfp_group` set `restricted`=' . $v . ' where `id`=' . $folder_id);
+	}
+	
+	public function change_auto_refresh($folder_id){
+		$folder = $this->get_folder_options($folder_id);
+		$v = ($folder->auto_refresh == 1) ? 0 : 1;
+		global $wpdb;
+		$wpdb->query('update `' . $wpdb->prefix . 'dfp_group` set `auto_refresh`=' . $v . ' where `id`=' . $folder_id);
+	}
+	
+	public function get_folder_options($folder_id){
+		global $wpdb;
+		return $wpdb->get_row('select `restricted`, `auto_refresh` from `' . $wpdb->prefix . 'dfp_group` where id=' . $folder_id);
 	}
 	
 	public function file_provider_menu(){
@@ -77,15 +120,21 @@ class DimdavidFileProviderAdmin {
 		}		
 		$html = '<div><h2>Opções do File Provider</h2>'. $this->get_notes() . '</div>';				
 		$html .= '<div style="width: 95%"><table class="wp-list-table widefat fixed striped posts">';
-		$html .= '<thead><tr><th scope="col" class="manage-column">Shortcode</th><th scope="col" class="manage-column">Nome de exibição</th><th scope="col" class="manage-column">Slug</th><th scope="col" class="manage-column">Diretório real</th><th scope="col" class="manage-column">Restrito</th><th></th></tr></thead>';
+		$html .= '<thead><tr><th scope="col" class="manage-column">Shortcode</th><th scope="col" class="manage-column">Nome de exibição</th><th scope="col" class="manage-column">Slug</th><th scope="col" class="manage-column">Diretório real</th><th scope="col" class="manage-column">Restrito</th><th>Atualizar</th><th></th></tr></thead>';
 		$html .= '<tbody id="the-list">';
 		
 		$folders = $this->get_all_folders();
 		
 		foreach ($folders as $folder){
-			$html .= '<tr><td><strong>[file_provider group=' . $folder->id . ']</strong></td><td>' . $folder->showname . '</td><td>' . $folder->name . '</td><td>' . $folder->dirpath . '</td><td>';
-			$html .= ($folder->restricted == 1) ? 'SIM' : 'NÃO';
-			$html .= '</td><td><form method="POST"><input type="hidden" name="folder_id" value="' . $folder->id . '" /><input type="hidden" name="option" value="remove" /><input type="submit" value="Remover" class="btn btn-danger" /></form></td>';
+			$html .= '<tr><td><strong>[file_provider group=' . $folder->id . ']</strong></td><td>' . $folder->showname . '</td><td>' . $folder->name . '</td><td>' . $folder->dirpath . '</td>';
+			$html .= '<td><form name="change_restrict" method="POST"><input type="hidden" name="option" value="restricted" /><input type="hidden" name="folder_id" value="' . $folder->id . '" /><input type="submit" value="';
+			$html .= ($folder->restricted == 1) ? 'Sim' : 'Não';
+			$html .= '" class="btn btn-change" /></form></td>';
+			$html .= '<td><form name="change_refresh" method="POST"><input type="hidden" name="option" value="auto_refresh" /><input type="hidden" name="folder_id" value="' . $folder->id . '" /><input type="submit" value="';
+			$html .= ($folder->auto_refresh == 1) ? 'Sim' : 'Não';
+			$html .= '" class="btn btn-change" /></form></td>';
+			$html .= '<td><form name="remove" method="POST"><input type="hidden" name="folder_id" value="' . $folder->id . '" /><input type="hidden" name="option" value="remove" /><input type="submit" value="Remover" class="btn btn-danger" /></form></td>';
+			$html .= '<td><form name="refresh" method="POST"><input type="hidden" name="folder_id" value="' . $folder->id . '" /><input type="hidden" name="folder_path" value="' . $folder->dirpath . '" /><input type="hidden" name="option" value="refresh" /><input type="submit" value="Atualizar" class="btn btn-refresh" /></form></td>';
 			$html .= '</tr>';
 		}
 		
@@ -116,6 +165,12 @@ class DimdavidFileProviderAdmin {
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							<input type="radio" name="folder_restrict" value="0" required />Não
 						</p>
+						<p>
+							<label for="folder_name">Atualizar automaticamente?</label><br />
+							<input type="radio" name="folder_refresh" value="1" required />Sim
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="folder_refresh" value="0" required />Não
+						</p>
 					</div>
 					<div id="publishing-action">
 						<span class="spinner"></span>
@@ -133,7 +188,7 @@ class DimdavidFileProviderAdmin {
 	
 	public function get_all_folders(){
 		global $wpdb;
-		$sql = 'select `id`, `showname`, `name`, `dirpath`, `restricted` from `' . $wpdb->prefix . 'dfp_group` order by `id`';
+		$sql = 'select `id`, `showname`, `name`, `dirpath`, `restricted`, `auto_refresh` from `' . $wpdb->prefix . 'dfp_group` order by `id`';
 		return $wpdb->get_results($sql);
 	}
 	
@@ -145,6 +200,8 @@ class DimdavidFileProviderAdmin {
 		<p>Ao excluir uma pasta, apenas o registro será removido. A pasta continuará a existir com seus arquivos.</p>
 		<h4>Restrito</h4>
 		<p>Apenas usuários autenticados poderão ver o conteúdo de pastas marcadas como restritas.</p>
+		<h4>Atualizar</h4>
+		<p>Atualiza automaticamente quando o usuário acessa a página.</p>
 		';
 		return $notes;
 	}

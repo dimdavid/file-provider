@@ -3,7 +3,7 @@
 Plugin Name: File Provider
 Plugin URI: https://wordpress.org/plugins/file-provider
 Description: It offers files on your page neatly. Enables direct editing descriptions, conduct upload directly by the front-end, differentiate public or private visibility and protects the actual link of the file to download.
-Version: 0.1.0
+Version: 1.2
 Author: dimdavid
 Author URI: http://dimdavid.wordpress.com/
 License: GPLv2 or later
@@ -17,7 +17,8 @@ if ( ! class_exists( 'DimdavidFileProvider' ) ) :
 
 class DimdavidFileProvider {
 
-	const VERSION = '0.1.1';
+	const VERSION = '1.2';
+	public $version = '1.2';
 	protected static $instance = null;
 
 	protected $pluginFilesPath = '';
@@ -438,9 +439,9 @@ function fileOpen(fileId){
 
 	protected function rename_folder(){
 		global $wpdb;
-		$folderId = $_POST['folderId'];
-		$newFolderName = $_POST['newFolderName'];
-		$groupId = $_POST['groupId'];
+		$folderId = sanitize_text_field($_POST['folderId']);
+		$newFolderName = sanitize_text_field($_POST['newFolderName']);
+		$groupId = sanitize_text_field($_POST['groupId']);
 		if ((current_user_can('edit_pages')) && ($folderID != '') && ($newFolderName != '') && ($groupId != '')){
 			$atualPath = $this->get_file_path($folderId);
 			$atualName = end(explode('/', $atualPath));
@@ -482,6 +483,52 @@ function fileOpen(fileId){
 		}
 	}
 	
+	private function save_cache($group_id, $content){
+		$file_path = wp_upload_dir();
+		$file_path = $file_path['basedir'] . '/file-provider-cache';
+		if(!is_dir($file_path)){
+			mkdir($file_path, 0755);
+		}
+		$file_name = $file_path . '/folder_' . $group_id . '.cache';
+		
+		$data = array(
+			'key' => md5('DimdavidFileProvider'.$content),
+			'content' => $content
+		);
+		
+		$content = serialize($data);
+		$content = base64_encode($content);
+		
+		$hand = fopen($file_name, 'w');
+		fwrite($hand, $content);
+		fclose($hand);
+	}
+	
+	private function load_cache($group_id){
+		$file_path = wp_upload_dir();
+		$file_name = $file_path['basedir'] . '/file-provider-cache/folder_' . $group_id . '.cache';
+		
+		@$handle = fopen($file_name, "r");
+		if($handle == false){
+			return '';
+		}
+		$content = fread($handle, filesize ($file_name));
+		fclose($handle);
+		
+		$content = base64_decode($content);
+		if($content == false){
+			return '';
+		}
+		$data = unserialize($content);
+		if($data == false){
+			return '';
+		}
+		if($data['key'] != md5('DimdavidFileProvider'.$data['content'])){
+			return '';
+		}
+		return $data['content'];
+	}
+	
 	public function show($atts){
 		echo $this->style();
 		echo $this->script();
@@ -491,16 +538,23 @@ function fileOpen(fileId){
 			return;
 		}
 		$groupPath = $this->get_group_path($groupId);
-		if (current_user_can('edit_pages')){
-			if($_POST){
+		if(!empty($groupPath)){
+			if (current_user_can('edit_pages')){
 				$this->post_option_folder();
 			}
 			if($this->isAutoRefresh($groupId)){
 				$this->import_files($groupPath, $groupId);
+				$content = $this->read_path($groupPath, $groupId);
+			} else {
+				$content = $this->load_cache($groupId);
+				if($content == ''){
+					$content = $this->read_path($groupPath, $groupId);
+					$this->save_cache($groupId, $content);
+				}
 			}
+			echo $this->show_search();
+			echo $content;
 		}
-		echo $this->show_search();
-		echo $this->read_path($groupPath, $groupId);
 	}
 
 	protected function show_search(){
@@ -546,11 +600,10 @@ function fileOpen(fileId){
 				)';
 		$wpdb->query($sql_groups);
 		$wpdb->query($sql_files);
-		try{
-			$sql_auto_refresh = 'select `auto_refresh` from `' . $wpdb->prefix . 'dfp_group` limit 1';
-			$value = $wpdb->get_var($sql_auto_refresh);
-		} catch (Exception $e){
-			$sql_auto_refresh = 'alter table `' . $wpdb->prefix . 'dfp_group` add auto_refresh tinyint not null default 1';
+		
+		$sql_auto_refresh = 'select `auto_refresh` from `' . $wpdb->prefix . 'dfp_group` limit 1';
+		if($wpdb->query($sql_auto_refresh) === false){
+			$sql_auto_refresh = 'alter table `' . $wpdb->prefix . 'dfp_group` add `auto_refresh` tinyint not null default 1';
 			$wpdb->query($sql_auto_refresh);
 		}
 	}
@@ -585,11 +638,17 @@ function fileOpen(fileId){
 		}
 	}
 	
+	public function admin_import_files($path, $group){
+		if (current_user_can('edit_pages')){
+			$this->import_files($path, $group);
+		}
+	}
+	
 	public function save_descr(){
 		global $wpdb;
 		if (current_user_can('edit_pages')){
-			$descr = $_POST['fileDescr'];
-			$id = $_POST['fileId'];
+			$descr = sanitize_text_field($_POST['fileDescr']);
+			$id = sanitize_text_field($_POST['fileId']);
 			$wpdb->update($wpdb->prefix . 'dfp_files', array('descr' => $descr), array('id' => $id), array('%s'), array('%d'));
 			wp_die('1');
 		} else {
@@ -598,19 +657,27 @@ function fileOpen(fileId){
 	}
 	
 	public function post_option_folder(){
-		if ($_POST['folderAction'] == 'uploadFile'){
-			$this->upload_file();
-		} else if ($_POST['folderAction'] == 'newFolder'){
-			$this->create_folder();
-		} else if ($_POST['folderAction'] == 'removeFolder'){
-			$this->remove_folder();
-		} else if ($_POST['folderAction'] == 'removeFile'){
-			$this->remove_file();
+		if(getenv("REQUEST_METHOD") == "POST"){
+			$option = sanitize_text_field($_POST['folderAction']);
+			switch ($option){
+				case 'uploadFile':
+					$this->upload_file();
+				break;
+				case 'newFolder':
+					$this->create_folder();
+				break;
+				case 'removeFolder':
+					$this->remove_folder();
+				break;
+				case 'removeFile':
+					$this->remove_file();
+				break;
+			}
 		}
 	}
 	
 	public function upload_file(){
-		$folderId = $_POST['folderId'];
+		$folderId = sanitize_text_field($_POST['folderId']);
 		$folderPath = $this->get_file_path($folderId);
 		$nome_final = $_FILES['userFile']['name'];
 		if (!move_uploaded_file($_FILES['userFile']['tmp_name'], $folderPath . '/' . $nome_final)) {
@@ -619,11 +686,11 @@ function fileOpen(fileId){
 	}
 	
 	public function create_folder(){
-		$folderName = $_POST['newFolderMame'];
+		$folderName = sanitize_text_field($_POST['newFolderMame']);
 		if ($folderName != ''){
 			$except = array('\\', '/', ':', '*', '?', '"', '<', '>', '|', '.'); 
 			$folderName = str_replace($except, '', $folderName);
-			$folderId = $_POST['folderId'];
+			$folderId = sanitize_text_field($_POST['folderId']);
 			$folderPath = $this->get_file_path($folderId);
 			$path = $folderPath . '/' . $folderName;
 			$path = str_replace('//', '/', $path);
@@ -638,7 +705,7 @@ function fileOpen(fileId){
 	}
 	
 	public function remove_folder(){
-		$folderId = $_POST['folderId'];
+		$folderId = sanitize_text_field($_POST['folderId']);
 		$folderPath = $this->get_file_path($folderId);
 		if(is_dir($folderPath)){
 			if(rmdir($folderPath)){
@@ -652,7 +719,7 @@ function fileOpen(fileId){
 	}
 	
 	public function remove_file(){
-		$fileId = $_POST['fileId'];
+		$fileId = sanitize_text_field($_POST['fileId']);
 		$filePath = $this->get_file_path($fileId);
 		if(is_file($filePath)){
 			if(unlink($filePath)){
