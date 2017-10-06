@@ -4,7 +4,7 @@ Donate link: https://dimdavid.wordpress.com/
 Tags: file, file manager, share, protect link, file provider, file page, directory 
 Requires at least: 3.9.13
 Tested up to: 4.8.2
-Stable tag: 1.2
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,8 @@ Permite disponibilizar arquivos de forma simplificada em sua página de maneira 
 * Opcionalmente a pasta poderá ser criada sem a atualização automática, ficando a cargo do administrador atualizar o conteúdo;
 * Armazenamento de visualização das pastas em cache melhorando a experiência do usuário.
 
+https://www.youtube.com/watch?v=ckEveuNbbEI
+
 = External reference =
 
 Icons family acquired free through http://www.iconarchive.com/
@@ -96,6 +98,14 @@ Ocorre quando arquivos são enviados com caracteres inválidos no nome.
 Verifique as permissões da pasta utilizada.
 
 == Changelog ==
+
+= 1.2.1 =
+
+* Fix import new files process by administrator environment updating the cache file;
+* Removes unnecessary variable call in the import process that showed a debug mode notice. 
+
+* Correção do processo de importação de novos arquivos pelo ambiente administrador atualizando o arquivo de cache;
+* Remove chamada de variável desnecessária no processo de importação que originava uma notificação no modo depuração.
 
 = 1.2 =
 

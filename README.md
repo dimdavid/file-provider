@@ -4,7 +4,7 @@ Donate link: https://dimdavid.wordpress.com/
 Tags: file, file manager, share, protect link, file provider, file page, directory 
 Requires at least: 3.9.13
 Tested up to: 4.8.2
-Stable tag: 1.1
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,7 +29,8 @@ It offers files on your page neatly. Enables direct editing descriptions, conduc
 * Customizarion of icons where the plugin checks for custom icons in your theme. For example: "/wp-content/themes/seuTema/file-provider/images/unknow.png";
 * Does not reveal the actual link to download the file;
 * Change folder options on admin page;
-* Optionally the folder can be created without auto refresh option. So, the update content need started from admin user.
+* Optionally the folder can be created without auto refresh option. So, the update content need started from admin user;
+* Cached folder view storage enhancing the user experience.
 
 ### O que é? ###
 
@@ -47,7 +48,10 @@ Permite disponibilizar arquivos de forma simplificada em sua página de maneira 
 * Customização de ícones onde o plugin checa a existência de ícones customizados dentro do tema utilizado. Por exemplo: "/wp-content/themes/seuTema/file-provider/images/unknow.png";
 * Não revela o link real de download do arquivo;
 * Modificar opções de pasta na página administrativa;
-* Opcionalmente a pasta poderá ser criada sem a atualização automática, ficando a cargo do administrador atualizar o conteúdo.
+* Opcionalmente a pasta poderá ser criada sem a atualização automática, ficando a cargo do administrador atualizar o conteúdo;
+* Armazenamento de visualização das pastas em cache melhorando a experiência do usuário.
+
+https://www.youtube.com/watch?v=ckEveuNbbEI
 
 ### External reference ###
 
@@ -94,6 +98,21 @@ Ocorre quando arquivos são enviados com caracteres inválidos no nome.
 Verifique as permissões da pasta utilizada.
 
 ## Changelog ##
+
+
+### 1.2.1 ###
+
+* Fix import new files process by administrator environment updating the cache file;
+* Removes unnecessary variable call in the import process that showed a debug mode notice. 
+
+* Correção do processo de importação de novos arquivos pelo ambiente administrador atualizando o arquivo de cache;
+* Remove chamada de variável desnecessária no processo de importação que originava uma notificação no modo depuração.
+
+### 1.2 ###
+
+* Caching when folder does not have automatic update.
+
+* Armazenamento em cache quando a pasta não possui atualização automática.
 
 ### 1.1 ###
 

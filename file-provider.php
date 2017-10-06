@@ -3,7 +3,7 @@
 Plugin Name: File Provider
 Plugin URI: https://wordpress.org/plugins/file-provider
 Description: It offers files on your page neatly. Enables direct editing descriptions, conduct upload directly by the front-end, differentiate public or private visibility and protects the actual link of the file to download.
-Version: 1.2
+Version: 1.2.1
 Author: dimdavid
 Author URI: http://dimdavid.wordpress.com/
 License: GPLv2 or later
@@ -17,8 +17,8 @@ if ( ! class_exists( 'DimdavidFileProvider' ) ) :
 
 class DimdavidFileProvider {
 
-	const VERSION = '1.2';
-	public $version = '1.2';
+	const VERSION = '1.2.1';
+	public $version = '1.2.1';
 	protected static $instance = null;
 
 	protected $pluginFilesPath = '';
@@ -529,6 +529,14 @@ function fileOpen(fileId){
 		return $data['content'];
 	}
 	
+	private function remove_cache($group_id){
+		$file_path = wp_upload_dir();
+		$file_name = $file_path['basedir'] . '/file-provider-cache/folder_' . $group_id . '.cache';
+		if(is_file($file_name)){
+			unlink($file_name);
+		}
+	}
+	
 	public function show($atts){
 		echo $this->style();
 		echo $this->script();
@@ -622,7 +630,7 @@ function fileOpen(fileId){
 			foreach($scn as $sc){
 				if($ct > 1){
 					if(is_dir($path . '/' . $sc)){
-						$html = $html . $this->import_files($path . '/' . $sc, $group);
+						$this->import_files($path . '/' . $sc, $group);
 					} else {
 						$filePath = $path . '/' . $sc;
 						$filePath = str_replace('\\', '/', $filePath);
@@ -641,6 +649,10 @@ function fileOpen(fileId){
 	public function admin_import_files($path, $group){
 		if (current_user_can('edit_pages')){
 			$this->import_files($path, $group);
+			if(!$this->isAutoRefresh($group)){
+				$content = $this->read_path($path, $group);
+				$this->save_cache($group, $content);
+			}
 		}
 	}
 	
